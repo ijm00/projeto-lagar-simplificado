@@ -5,18 +5,33 @@ import caminhao.EstadosCaminhao.StatusCaminhao;
 
 public class Plantacao {
     private Azeitona azeitona;
+    private boolean produzindo;
     private Integer distanciaAteLagar;
 
     public Plantacao(Azeitona azeitona, Integer distanciaAteLagar) {
         this.azeitona = azeitona;
         this.distanciaAteLagar = distanciaAteLagar;
+        this.produzindo = true;
     }
 
     public Azeitona getAzeitona() {
         return azeitona;
     }
+
     public Integer getDistanciaAteLagar() {
         return distanciaAteLagar;
+    }
+
+    public void suspenderProducao() {
+        this.produzindo = false;
+    }
+
+    public void retomarProducao() {
+        this.produzindo = true;
+    }
+    
+    public boolean isProduzindo() {
+        return produzindo;
     }
 
     public void abastecerCaminhao(Caminhao caminhao, long tempoProcessamentoMillis) {
@@ -30,7 +45,7 @@ public class Plantacao {
                     ie.printStackTrace();
                 }
             }
-        
+    
     }
     
 }
