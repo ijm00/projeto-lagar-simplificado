@@ -4,7 +4,7 @@ public class CarregadoEstado implements EstadosCaminhao {
 
     @Override
     public boolean proximo(Caminhao caminhao) {
-        caminhao.setEstadoCaminhao(new TransportandoEstado());
+        caminhao.setEstado(new TransportandoEstado());
         return true;
     }
 
@@ -14,7 +14,7 @@ public class CarregadoEstado implements EstadosCaminhao {
     }
 
     @Override
-    public StatusCaminhao getStatusCaminhao() {
+    public StatusCaminhao getStatus() {
         return StatusCaminhao.CARREGADO;
     }
     

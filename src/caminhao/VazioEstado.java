@@ -4,7 +4,7 @@ public class VazioEstado implements EstadosCaminhao{
 
     @Override
     public boolean proximo(Caminhao caminhao) {
-        caminhao.setEstadoCaminhao(new CarregadoEstado());
+        caminhao.setEstado(new CarregadoEstado());
         return true;
     }
 
@@ -14,7 +14,7 @@ public class VazioEstado implements EstadosCaminhao{
     }
 
     @Override
-    public StatusCaminhao getStatusCaminhao() {
+    public StatusCaminhao getStatus() {
         return StatusCaminhao.VAZIO;
     }
     

@@ -13,7 +13,7 @@ public class DescarregadoProcessadoEstado implements EstadosCaminhao{
     }
 
     @Override
-    public StatusCaminhao getStatusCaminhao() {
+    public StatusCaminhao getStatus() {
         return StatusCaminhao.DESCARREGADO_PROCESSADO;
     }
     

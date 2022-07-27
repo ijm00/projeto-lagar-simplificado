@@ -5,18 +5,18 @@ import java.util.Random;
 import caminhao.EstadosCaminhao.StatusCaminhao;
 
 public class Caminhao {
-    private Integer capacidadeCaminhaoToneladas;
+    private Integer capacidadeToneladas;
 
-    private EstadosCaminhao estadoCaminhao = new VazioEstado();
+    private EstadosCaminhao estado = new VazioEstado();
     private Runnable descarregou;
       
-    public Caminhao(int capacidadeMinimaCaminhao, int capacidadeMaximaCaminhao) {
-        this.capacidadeCaminhaoToneladas = new Random()
-                .nextInt(capacidadeMaximaCaminhao + 1 - capacidadeMinimaCaminhao) + capacidadeMinimaCaminhao;
+    public Caminhao(int capacidadeMinima, int capacidadeMaxima) {
+        this.capacidadeToneladas = new Random()
+                .nextInt(capacidadeMaxima + 1 - capacidadeMinima) + capacidadeMinima;
     }
 
-    public Integer getCapacidadeCaminhaoToneladas() {
-        return capacidadeCaminhaoToneladas;
+    public Integer getCapacidadeToneladas() {
+        return capacidadeToneladas;
     }
 
     public void quandoDescarregou(Runnable descarregou) {
@@ -30,11 +30,11 @@ public class Caminhao {
 
     public void transportarAzeitonas(int distanciaAteLagar) {
         System.out.println("Transportando azeitonas");
-        if (this.getEstadoCaminhao().getStatusCaminhao() == StatusCaminhao.CARREGADO) {
+        if (this.getEstado() == StatusCaminhao.CARREGADO) {
             try {
                 Thread.sleep(distanciaAteLagar*1_000);
                 this.avancaEstado();
-                System.out.println(this.getEstadoCaminhao().getStatusCaminhao());
+                System.out.println(this.getEstado());
             } catch (InterruptedException ie) {
                 ie.printStackTrace();
             }
@@ -42,24 +42,24 @@ public class Caminhao {
     }
 
     public void entrarNaFilaRecepcao() {
-        if (this.getEstadoCaminhao() instanceof TransportandoEstado) {
+        if (this.getEstado() == StatusCaminhao.TRANSPORTADO) {
             this.avancaEstado();
-            System.out.println(this.getEstadoCaminhao().getStatusCaminhao());
+            System.out.println(this.getEstado());
         }
     }
 
 
     public void avancaEstado() {
-        estadoCaminhao.proximo(this);
+        estado.proximo(this);
     }
 
 
-    protected void setEstadoCaminhao(EstadosCaminhao estadoCaminhao) {
-        this.estadoCaminhao = estadoCaminhao;
+    protected void setEstado(EstadosCaminhao estado) {
+        this.estado = estado;
     }
 
-    public EstadosCaminhao getEstadoCaminhao() {
-        return estadoCaminhao;
+    public StatusCaminhao getEstado() {
+        return estado.getStatus();
     }
 
 

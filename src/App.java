@@ -20,7 +20,7 @@ public class App {
         Long tempoProcessamentoMillis = tempoProcessamentoCaminhao
                 .getTempoProcessamento(4,
                         2,
-                        caminhao.getCapacidadeCaminhaoToneladas());
+                        caminhao.getCapacidadeToneladas());
 
         long inicio = System.currentTimeMillis();
         plantacao.abastecerCaminhao(caminhao, tempoProcessamentoMillis);
@@ -32,8 +32,8 @@ public class App {
 
         System.out.println(String.format("%s - %04d >> %d toneladas de Galega na recepção 1 de origem da plantação 1 com tempo total de %d segundos.",
             LocalDateTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss")),
-            caminhao.getCapacidadeCaminhaoToneladas(),
-            caminhao.getCapacidadeCaminhaoToneladas(),
+            caminhao.getCapacidadeToneladas(),
+            caminhao.getCapacidadeToneladas(),
             TimeUnit.MILLISECONDS.toSeconds(tempoDecorrido)
             ));
     }

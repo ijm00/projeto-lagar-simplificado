@@ -21,11 +21,11 @@ public class Plantacao {
 
     public void abastecerCaminhao(Caminhao caminhao, long tempoProcessamentoMillis) {
             System.out.println("Abastecendo caminhão");
-            if (caminhao.getEstadoCaminhao().getStatusCaminhao() == StatusCaminhao.VAZIO) {
+            if (caminhao.getEstado() == StatusCaminhao.VAZIO) {
                 try {
                     Thread.sleep(tempoProcessamentoMillis);
                     caminhao.avancaEstado();
-                    System.out.println(caminhao.getEstadoCaminhao().getStatusCaminhao());
+                    System.out.println(caminhao.getEstado());
                 } catch (InterruptedException ie) {
                     ie.printStackTrace();
                 }

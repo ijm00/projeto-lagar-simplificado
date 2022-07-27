@@ -1,11 +1,11 @@
 public class Azeitona {
-    private String variedadeAzeitona;
+    private String variedade;
 
-    public Azeitona(String variedadeAzeitona){
-        this.variedadeAzeitona = variedadeAzeitona;
+    public Azeitona(String variedade){
+        this.variedade = variedade;
     }
 
-    public String getVariedadeAzeitona() {
-        return variedadeAzeitona;
+    public String getVariedade() {
+        return variedade;
     }
 }

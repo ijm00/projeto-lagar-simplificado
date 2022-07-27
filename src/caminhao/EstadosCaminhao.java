@@ -13,6 +13,6 @@ public interface EstadosCaminhao {
 
     StatusCaminhao proximosEstados();
 
-    StatusCaminhao getStatusCaminhao();
+    StatusCaminhao getStatus();
 
 }
