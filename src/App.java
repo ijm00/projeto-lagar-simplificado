@@ -36,9 +36,6 @@ public class App {
             caminhao.getCapacidadeCaminhaoToneladas(),
             TimeUnit.MILLISECONDS.toSeconds(tempoDecorrido)
             ));
-
-
-
     }
 
 }
