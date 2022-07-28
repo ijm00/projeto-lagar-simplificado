@@ -7,6 +7,7 @@ public class Plantacao {
     private Azeitona azeitona;
     private boolean produzindo;
     private Integer distanciaAteLagar;
+    
 
     public Plantacao(Azeitona azeitona, Integer distanciaAteLagar) {
         this.azeitona = azeitona;

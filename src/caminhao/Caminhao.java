@@ -1,14 +1,13 @@
 package caminhao;
 
 import java.util.Random;
-
 import caminhao.EstadosCaminhao.StatusCaminhao;
 
 public class Caminhao {
     private Integer capacidadeToneladas;
-
     private EstadosCaminhao estado = new VazioEstado();
     private Runnable descarregou;
+    
       
     public Caminhao(int capacidadeMinima, int capacidadeMaxima) {
         this.capacidadeToneladas = new Random()
@@ -44,6 +43,7 @@ public class Caminhao {
     public void entrarNaFilaRecepcao() {
         if (this.getEstado() == StatusCaminhao.TRANSPORTADO) {
             this.avancaEstado();
+            FilaDeCaminhoes.getInstance().adicionar(this);
             System.out.println(this.getEstado());
         }
     }
