@@ -1,7 +1,11 @@
 import java.time.LocalDateTime;
+import java.time.chrono.Chronology;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
-
+import java.util.concurrent.atomic.AtomicLong;
+import java.util.function.Supplier;
 
 import caminhao.Caminhao;
 import caminhao.FilaDeCaminhoes;
@@ -9,50 +13,43 @@ import caminhao.FilaDeCaminhoes;
 public class App {
     public static void main(String[] args) throws InterruptedException {
         
-        Caminhao caminhao1 = new Caminhao(4, 16);
-        Caminhao caminhao2 = new Caminhao(4, 16);
         Azeitona azeitonaGalega = new Azeitona("galega");
         Plantacao plantacao = new Plantacao(azeitonaGalega, 4);
         RecepcaoLagar recepcao = new RecepcaoLagar();
-        long tempoDecorrido;
-        TempoCargaDescarga tempoProcessamentoCaminhao = (pesoConsiderado, TempoCargaDescargaDoPeso,
-                capacidadeDoCaminhao) -> {
-            return TimeUnit.SECONDS.toMillis( TempoCargaDescargaDoPeso * capacidadeDoCaminhao / pesoConsiderado );
-        };
-        Long tempoProcessamentoMillis = tempoProcessamentoCaminhao
-                .getTempoProcessamento(4,
-                        2,
-                        caminhao1.getCapacidadeToneladas());
+        
+        Thread abastecimentoCaminhoes = new Thread(() -> {
+            long tempoTotaldecorrido = 0L;
+            long tempoDecorrido;
+            while (tempoTotaldecorrido < 30_000L) {
+                long inicioOperacao = System.currentTimeMillis(); 
+                    plantacao.abastecerCaminhao();
+                    long fimOperacao = System.currentTimeMillis();
+                tempoDecorrido = fimOperacao - inicioOperacao; 
+                System.out.println("Abastecimento ocorreu no seguinte tempo em millis: " + tempoDecorrido);
+                tempoTotaldecorrido += tempoDecorrido;
+            }
+             
+            
 
-        long inicio = System.currentTimeMillis();
-        plantacao.abastecerCaminhao(caminhao1, tempoProcessamentoMillis);
-        caminhao1.transportarAzeitonas(plantacao.getDistanciaAteLagar());
-        caminhao1.entrarNaFilaRecepcao();
-        plantacao.abastecerCaminhao(caminhao2, tempoProcessamentoMillis);
-        caminhao2.transportarAzeitonas(plantacao.getDistanciaAteLagar());
-        caminhao2.entrarNaFilaRecepcao();
-        System.out.println(FilaDeCaminhoes.getInstance().getFila().stream().count());
-        recepcao.descarregarCaminhao(caminhao1, tempoProcessamentoMillis);
-        FilaDeCaminhoes.getInstance().getFila().forEach(System.out::println);
-        recepcao.descarregarCaminhao(caminhao2, tempoProcessamentoMillis);
-        FilaDeCaminhoes.getInstance().getFila().forEach(System.out::println);
-        long fim = System.currentTimeMillis();
-        tempoDecorrido = fim - inicio;
+        });
+
+        abastecimentoCaminhoes.setPriority(1);
+        abastecimentoCaminhoes.start();
+
+
+
+
+        
+            
 
         
 
-        System.out.println(String.format("%s - %04d >> %d toneladas de Galega na recepção 1 de origem da plantação 1 com tempo total de %d segundos.",
-            LocalDateTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss")),
-            caminhao1.getCapacidadeToneladas(),
-            caminhao1.getCapacidadeToneladas(),
-            TimeUnit.MILLISECONDS.toSeconds(tempoDecorrido)
-            ));
-        System.out.println(String.format("%s - %04d >> %d toneladas de Galega na recepção 1 de origem da plantação 1 com tempo total de %d segundos.",
-        LocalDateTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss")),
-        caminhao2.getCapacidadeToneladas(),
-        caminhao2.getCapacidadeToneladas(),
-        TimeUnit.MILLISECONDS.toSeconds(tempoDecorrido)
-        ));
-    }
+            
 
+
+        
+
+        
+
+    }
 }
