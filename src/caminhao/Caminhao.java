@@ -1,19 +1,32 @@
 package caminhao;
+import java.time.LocalDateTime;
 import java.util.Random;
 import caminhao.EstadosCaminhao.StatusCaminhao;
+import relatorio.Relatorio;
 
 public class Caminhao {
     private Integer capacidadeToneladas;
     private EstadosCaminhao estado;
     private Runnable descarregou;
     private long tempoProcessamentoMillis;
+    private Relatorio relatorio;
+
+
 
     public Caminhao(int capacidadeMinima, int capacidadeMaxima, double fluxoCargaDescargaTonsPorSegundo) {
         this.capacidadeToneladas = new Random()
             .nextInt(capacidadeMaxima + 1 - capacidadeMinima) + capacidadeMinima;
         this.tempoProcessamentoMillis = Math.round(1000*(this.capacidadeToneladas/fluxoCargaDescargaTonsPorSegundo));
         this.estado = new VazioEstado();
+        this.relatorio = new Relatorio();
+        this.relatorio.setCapacidadeCaminhao(this.capacidadeToneladas);
+        this.relatorio.setInicioViagemCaminhao(LocalDateTime.now());
     }
+
+    public Relatorio getRelatorio() {
+        return relatorio;
+    }
+
     
     public Integer getCapacidadeToneladas() {
         return capacidadeToneladas;
@@ -72,7 +85,5 @@ public class Caminhao {
     public StatusCaminhao getEstado() {
         return estado.getStatus();
     }
-
-
 
 }

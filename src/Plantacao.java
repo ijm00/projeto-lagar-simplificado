@@ -41,6 +41,8 @@ public class Plantacao {
     public Plantacao abastecerCaminhao() {
         if (this.produzindo && !this.abastecendoCaminhao) {
             this.caminhao = this.requisitarCaminhao();
+            this.caminhao.getRelatorio().setCodigoPlantacao(1); //TODO hardcode aqui!
+            this.caminhao.getRelatorio().setTipoAzeitona(this.getAzeitona().getVariedade());
             System.out.println("Abastecendo caminhão " + this.caminhao);
             abastecendoCaminhao = true;
             try {
