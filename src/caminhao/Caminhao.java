@@ -29,12 +29,12 @@ public class Caminhao {
     }
 
     public void transportarAzeitonas(int distanciaAteLagar) {
-        System.out.println("Transportando azeitonas");
+        System.out.println("Transportando azeitonas " + this);
         if (this.getEstado() == StatusCaminhao.CARREGADO) {
             try {
                 Thread.sleep(distanciaAteLagar*1_000);
                 this.avancaEstado();
-                System.out.println(this.getEstado());
+                System.out.println(this + " "  + this.getEstado());
                 this.entrarNaFilaRecepcao();
             } catch (InterruptedException ie) {
                 ie.printStackTrace();
@@ -45,8 +45,9 @@ public class Caminhao {
     private void entrarNaFilaRecepcao() {
         if (this.getEstado() == StatusCaminhao.TRANSPORTADO) {
             this.avancaEstado();
+            
             FilaDeCaminhoes.getInstance().adicionar(this);
-            System.out.println(this.getEstado());
+            System.out.println(this + " " +this.getEstado());
         }
     }
 

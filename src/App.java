@@ -1,55 +1,57 @@
-import java.time.LocalDateTime;
-import java.time.chrono.Chronology;
-import java.time.format.DateTimeFormatter;
-import java.time.temporal.ChronoUnit;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicLong;
-import java.util.function.Supplier;
 
-import caminhao.Caminhao;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
+
 import caminhao.FilaDeCaminhoes;
 
 public class App {
-    public static void main(String[] args) throws InterruptedException {
-        
+    public static void main(String[] args) throws InterruptedException, ExecutionException {
         Azeitona azeitonaGalega = new Azeitona("galega");
         Plantacao plantacao = new Plantacao(azeitonaGalega, 4);
+        Lagar lagar = new Lagar(1);
         RecepcaoLagar recepcao = new RecepcaoLagar();
-        
-        Thread abastecimentoCaminhoes = new Thread(() -> {
+        ExecutorService produzir = Executors.newFixedThreadPool(1);
+
+
+        produzir.execute(() -> {
             long tempoTotaldecorrido = 0L;
             long tempoDecorrido;
-            while (tempoTotaldecorrido < 30_000L) {
+            while (tempoTotaldecorrido < 12_000) {
                 long inicioOperacao = System.currentTimeMillis(); 
-                    plantacao.abastecerCaminhao();
+                    plantacao.abastecerCaminhao().despacharCaminhao();
                     long fimOperacao = System.currentTimeMillis();
-                tempoDecorrido = fimOperacao - inicioOperacao; 
+                tempoDecorrido = fimOperacao - inicioOperacao;
                 System.out.println("Abastecimento ocorreu no seguinte tempo em millis: " + tempoDecorrido);
                 tempoTotaldecorrido += tempoDecorrido;
             }
-             
-            
-
         });
 
-        abastecimentoCaminhoes.setPriority(1);
-        abastecimentoCaminhoes.start();
+        produzir.shutdown();
 
+
+        ExecutorService descarregarCaminhoes = Executors.newFixedThreadPool(lagar.getNumeroPortasRecepcao());
+        while (!produzir.isTerminated()) {
+            if (!FilaDeCaminhoes.getInstance().getFila().isEmpty())
+                descarregarCaminhoes.execute(() -> {
+                    recepcao.descarregarCaminhoes();
+            });
+
+        }
+        descarregarCaminhoes.shutdown();
+
+
+        
+
+
+        
 
 
 
         
-            
 
         
-
-            
-
-
         
-
-        
-
     }
 }

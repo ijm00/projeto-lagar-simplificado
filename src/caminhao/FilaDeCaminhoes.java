@@ -1,11 +1,10 @@
 package caminhao;
-import java.util.LinkedList;
-import java.util.Queue;
+
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class FilaDeCaminhoes {
     private static FilaDeCaminhoes filaDeCaminhoes;
-
-    private Queue<Caminhao> fila = new LinkedList<>();
+    private ConcurrentLinkedQueue<Caminhao> filaConcorrente = new ConcurrentLinkedQueue<>();
     
     private FilaDeCaminhoes() {
 
@@ -19,15 +18,15 @@ public class FilaDeCaminhoes {
     }
 
     public void adicionar(Caminhao caminhao) {
-        this.fila.add(caminhao);
+        this.filaConcorrente.add(caminhao);
     }
 
-    public void processar() {
-        this.fila.poll();
+    public Caminhao processar() {
+            return this.filaConcorrente.poll();
     }
     
-    public Queue<Caminhao> getFila() {
-        return fila;
+    public ConcurrentLinkedQueue<Caminhao> getFila() {
+        return filaConcorrente;
     }
 
 }

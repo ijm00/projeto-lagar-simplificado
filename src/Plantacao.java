@@ -1,4 +1,5 @@
 
+
 import caminhao.Caminhao;
 
 
@@ -7,7 +8,8 @@ public class Plantacao {
     private boolean produzindo;
     private boolean abastecendoCaminhao;
     private Integer distanciaAteLagar;
-    
+    private Caminhao caminhao;
+   
 
     public Plantacao(Azeitona azeitona, Integer distanciaAteLagar) {
         this.azeitona = azeitona;
@@ -36,17 +38,17 @@ public class Plantacao {
         return produzindo;
     }
 
-    public void abastecerCaminhao() {
+    public Plantacao abastecerCaminhao() {
         if (this.produzindo && !this.abastecendoCaminhao) {
-            Caminhao caminhao = this.requisitarCaminhao();
-            System.out.println("Abastecendo caminhão");
+            this.caminhao = this.requisitarCaminhao();
+            System.out.println("Abastecendo caminhão " + this.caminhao);
             abastecendoCaminhao = true;
             try {
-                Thread.sleep(caminhao.getTempoProcessamentoMillis());
-                caminhao.avancaEstado();
+                Thread.sleep(this.caminhao.getTempoProcessamentoMillis());
+                this.caminhao.avancaEstado();
                 this.abastecendoCaminhao = false;
-                System.out.println(caminhao.getEstado());
-                MovimentadorCaminhoes.encaminharParaLagar(this, caminhao);
+                System.out.println(this.caminhao + " " + this.caminhao.getEstado());
+                
             } catch (InterruptedException ie) {
                 ie.printStackTrace();
             }
@@ -55,10 +57,15 @@ public class Plantacao {
                 System.out.println("A plantação parou de produzir!");
             }
         }
+        return this;
     }
 
     private Caminhao requisitarCaminhao() {
         return FornecedorCaminhoes.enviarCaminhao();
+    }
+
+    public void despacharCaminhao() {
+        OrquestradorCaminhoes.encaminharParaLagar(this, this.caminhao);
     }
 
 
