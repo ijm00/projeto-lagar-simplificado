@@ -12,13 +12,22 @@ public class Plantacao {
     private boolean abastecendoCaminhao;
     private Integer distanciaAteLagar;
     private Caminhao caminhao;
-   
+    private Integer codigo;
+
+
+    private static Integer geradorCodigos = 0;
 
     public Plantacao(Azeitona azeitona, Integer distanciaAteLagar) {
+        geradorCodigos += 1;
+        this.codigo = geradorCodigos;
         this.azeitona = azeitona;
         this.distanciaAteLagar = distanciaAteLagar;
         this.produzindo = true;
         this.abastecendoCaminhao = false;
+    }
+
+    public Integer getCodigo() {
+        return codigo;
     }
 
     public Azeitona getAzeitona() {
@@ -53,7 +62,7 @@ public class Plantacao {
                 }
                 if(!this.isProduzindo() && fila.size() == 4){
                     this.retomarProducao();
-                    System.out.println("Retomando produção!");
+                    System.out.println("Plantação" + this.codigo + "retomando produção!");
                 }
             }
         };
@@ -74,7 +83,7 @@ public class Plantacao {
     public Plantacao abastecerCaminhao() {
         if (this.produzindo && !this.abastecendoCaminhao) {
             this.caminhao = this.requisitarCaminhao();
-            this.caminhao.getRelatorio().setCodigoPlantacao(1); //TODO hardcode aqui!
+            this.caminhao.getRelatorio().setCodigoPlantacao(this.codigo);
             this.caminhao.getRelatorio().setTipoAzeitona(this.getAzeitona().getVariedade());
             System.out.println("Abastecendo caminhão " + this.caminhao);
             abastecendoCaminhao = true;
@@ -89,7 +98,7 @@ public class Plantacao {
             }
         } else {
             if (!this.produzindo) {
-                System.out.println("A plantação parou de produzir!");
+                System.out.println("A plantação" + this.codigo + "parou de produzir!");
             }
         }
         return this;
