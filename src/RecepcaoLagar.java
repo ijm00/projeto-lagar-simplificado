@@ -14,7 +14,7 @@ public class RecepcaoLagar {
                 caminhao.avancaEstado();
                 System.out.println(caminhao.toString() + caminhao.getEstado());
                 
-                caminhao.getRelatorio().setCodigoRecepcao(Thread.currentThread().getName().substring(Thread.currentThread().getName().length() - 1)); //TODO hardCode aqui!!
+                caminhao.getRelatorio().setCodigoRecepcao(Thread.currentThread().getName().substring(Thread.currentThread().getName().length() - 1));
                 caminhao.getRelatorio().setFimViagemCaminhao(LocalDateTime.now());
 
                 synchronized (this) {

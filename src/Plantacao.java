@@ -1,6 +1,9 @@
 
 
+import java.util.concurrent.ConcurrentLinkedQueue;
+
 import caminhao.Caminhao;
+import caminhao.FilaDeCaminhoes;
 
 
 public class Plantacao {
@@ -24,6 +27,36 @@ public class Plantacao {
 
     public Integer getDistanciaAteLagar() {
         return distanciaAteLagar;
+    }
+
+    public Runnable produzirTask(Long limiteTempoProducao) {
+        return () -> {
+            ConcurrentLinkedQueue<Caminhao> fila = FilaDeCaminhoes.getInstance().getFila();
+            long tempoTotaldecorrido = 0L;
+            long tempoDecorrido;
+            while (tempoTotaldecorrido < limiteTempoProducao) {
+                long inicioOperacao = System.currentTimeMillis(); 
+                    this.abastecerCaminhao().despacharCaminhao();
+                long fimOperacao = System.currentTimeMillis();
+                tempoDecorrido = fimOperacao - inicioOperacao;
+                System.out.println("Abastecimento ocorreu no seguinte tempo em millis: " + tempoDecorrido);
+                tempoTotaldecorrido += tempoDecorrido;
+                
+                if (fila.size() >= 12) {
+                    this.suspenderProducao();
+                    System.out.println("Produção suspensa!");
+                    try {
+                        Thread.sleep(500);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+                if(!this.isProduzindo() && fila.size() == 4){
+                    this.retomarProducao();
+                    System.out.println("Retomando produção!");
+                }
+            }
+        };
     }
 
     public void suspenderProducao() {
