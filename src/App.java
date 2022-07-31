@@ -45,7 +45,7 @@ public class App {
         
         while(true) {
             if (produzir.isTerminated() && descarregarCaminhoes.isTerminated()) {
-                System.out.println("Aguardando caminhoes remanescentes");
+                //System.out.println("Aguardando caminhoes remanescentes");
                 Thread.sleep(15_000);
                 while (!fila.isEmpty()) {
                     descarregarRestantes.execute(descarregarCaminhoesTask);

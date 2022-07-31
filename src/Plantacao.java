@@ -48,7 +48,7 @@ public class Plantacao {
                     this.abastecerCaminhao().despacharCaminhao();
                 long fimOperacao = System.currentTimeMillis();
                 tempoDecorrido = fimOperacao - inicioOperacao;
-                System.out.println("Abastecimento ocorreu no seguinte tempo em millis: " + tempoDecorrido);
+                //System.out.println("Abastecimento ocorreu no seguinte tempo em millis: " + tempoDecorrido);
                 tempoTotaldecorrido += tempoDecorrido;
                 
                 if (fila.size() >= 12) {
@@ -85,20 +85,20 @@ public class Plantacao {
             this.caminhao = this.requisitarCaminhao();
             this.caminhao.getRelatorio().setCodigoPlantacao(this.codigo);
             this.caminhao.getRelatorio().setTipoAzeitona(this.getAzeitona().getVariedade());
-            System.out.println("Abastecendo caminhão " + this.caminhao);
+            //System.out.println("Abastecendo caminhão " + this.caminhao);
             abastecendoCaminhao = true;
             try {
                 Thread.sleep(this.caminhao.getTempoProcessamentoMillis());
                 this.caminhao.avancaEstado();
                 this.abastecendoCaminhao = false;
-                System.out.println(this.caminhao + " " + this.caminhao.getEstado());
+                //System.out.println(this.caminhao + " " + this.caminhao.getEstado());
                 
             } catch (InterruptedException ie) {
                 ie.printStackTrace();
             }
         } else {
             if (!this.produzindo) {
-                System.out.println("A plantação" + this.codigo + "parou de produzir!");
+                //System.out.println("A plantação" + this.codigo + "parou de produzir!");
             }
         }
         return this;
