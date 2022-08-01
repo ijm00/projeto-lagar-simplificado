@@ -10,7 +10,7 @@ public class Relatorio {
     private LocalDateTime fimViagemCaminhao;    
     private Integer capacidadeCaminhao;
     private String tipoAzeitona;
-    private static Integer contadorToneladasProcessadas;
+    private static Integer contadorToneladasProcessadas = 0;
 
     public Integer getCodigoPlantacao() {
         return codigoPlantacao;
@@ -66,10 +66,6 @@ public class Relatorio {
 
     public static void incrementarToneladasProcessadas(Integer toneladasProcessadas) {
         Relatorio.contadorToneladasProcessadas += toneladasProcessadas;
-    }
-
-    public Relatorio() {
-        contadorToneladasProcessadas = 0;
     }
     
     @Override
