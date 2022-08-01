@@ -1,11 +1,10 @@
 
-
+import java.time.LocalDateTime;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicReference;
 
 import caminhao.Caminhao;
 import caminhao.FilaDeCaminhoes;
-
 
 public class Plantacao {
     private Azeitona azeitona;
@@ -15,9 +14,8 @@ public class Plantacao {
     private Caminhao caminhao;
     private Integer codigo;
 
-    private AtomicReference<ConcurrentLinkedQueue<Caminhao>> fila = 
-        new AtomicReference<ConcurrentLinkedQueue<Caminhao>>(FilaDeCaminhoes.getInstance().getFila());
-
+    private AtomicReference<ConcurrentLinkedQueue<Caminhao>> fila = new AtomicReference<ConcurrentLinkedQueue<Caminhao>>(
+            FilaDeCaminhoes.getInstance().getFila());
 
     private static Integer geradorCodigos = 0;
 
@@ -42,33 +40,28 @@ public class Plantacao {
         return distanciaAteLagar;
     }
 
-    public Runnable produzirTask(Long limiteTempoProducao) {
+    public Runnable produzirTask(Integer limiteTempoProducaoMinutos) {
         return () -> {
-            long tempoTotaldecorrido = 0L;
-            long tempoDecorrido;
-            long inicioOperacao = System.currentTimeMillis(); 
-            while (tempoTotaldecorrido < limiteTempoProducao) {
-                this.abastecerCaminhao().despacharCaminhao();
-                
+            final LocalDateTime inicioOperacao = LocalDateTime.now();
+            while (LocalDateTime.now().isBefore(inicioOperacao.plusMinutes(limiteTempoProducaoMinutos))) {
+                if (this.produzindo) {
+                    this.abastecerCaminhao().despacharCaminhao();
+                }
+
                 if (fila.get().size() >= 12) {
                     try {
-                    this.suspenderProducao();
-                    System.out.println("Produção suspensa!" + " O tamanho da fila é " + fila.get().size() + ".");
-                    Thread.sleep(500);
+                        this.suspenderProducao();
+                        System.out.println("Produção suspensa!" + " O tamanho da fila é " + fila.get().size() + ".");
+                        Thread.sleep(500);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
-                } 
-                
-                if (!this.isProduzindo() && fila.get().size() <= 4) {
-                    this.retomarProducao();
-                    System.out.println("Plantação " + this.codigo + "retomando produção!");
                 }
-                
-                long fimOperacao = System.currentTimeMillis();
-                tempoDecorrido = fimOperacao - inicioOperacao;
-                //System.out.println("Abastecimento ocorreu no seguinte tempo em millis: " + tempoDecorrido);
-                tempoTotaldecorrido += tempoDecorrido;
+
+                if (!this.produzindo && fila.get().size() <= 4) {
+                    this.retomarProducao();
+                    System.out.println("Plantação " + this.codigo + " retomando produção!");
+                }
             }
         };
     }
@@ -80,7 +73,7 @@ public class Plantacao {
     public void retomarProducao() {
         this.produzindo = true;
     }
-    
+
     public boolean isProduzindo() {
         return this.produzindo;
     }
@@ -90,18 +83,18 @@ public class Plantacao {
             this.caminhao = this.requisitarCaminhao();
             this.caminhao.getRelatorio().setCodigoPlantacao(this.codigo);
             this.caminhao.getRelatorio().setTipoAzeitona(this.getAzeitona().getVariedade());
-            //System.out.println("Abastecendo caminhão " + this.caminhao);
+            // System.out.println("Abastecendo caminhão " + this.caminhao);
             abastecendoCaminhao = true;
             try {
                 Thread.sleep(this.caminhao.getTempoProcessamentoMillis());
                 this.caminhao.avancaEstado();
                 this.abastecendoCaminhao = false;
-                //System.out.println(this.caminhao + " " + this.caminhao.getEstado());
-                
+                // System.out.println(this.caminhao + " " + this.caminhao.getEstado());
+
             } catch (InterruptedException ie) {
                 ie.printStackTrace();
             }
-        } 
+        }
         return this;
     }
 
@@ -113,6 +106,4 @@ public class Plantacao {
         OrquestradorCaminhoes.encaminharParaLagar(this, this.caminhao);
     }
 
-
-    
 }
