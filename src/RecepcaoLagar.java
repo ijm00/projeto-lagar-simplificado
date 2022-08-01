@@ -5,11 +5,21 @@ import caminhao.FilaDeCaminhoes;
 import relatorio.Relatorio;
 
 public class RecepcaoLagar {
+
+
+    Runnable descarregarCaminhoesTask() {
+        return () -> {
+            this.descarregarCaminhoes();
+        };
+    }  
+
+
     public void descarregarCaminhoes() {
-        Caminhao caminhao = FilaDeCaminhoes.getInstance().processar();
+        Caminhao caminhao = FilaDeCaminhoes.getInstance().getFila().poll();
         if (caminhao != null) {
             try {
-                //System.out.println("Descarregando caminhão " + caminhao);
+                System.out.println("Descarregando caminhão " + caminhao);
+                System.out.println("Tamanho da fila: " + FilaDeCaminhoes.getInstance().getFila().size());
                 Thread.sleep(caminhao.getTempoProcessamentoMillis());
                 caminhao.avancaEstado();
                 //System.out.println(caminhao.toString() + caminhao.getEstado());

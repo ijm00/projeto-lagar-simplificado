@@ -10,39 +10,52 @@ import caminhao.FilaDeCaminhoes;
 public class App {
     public static void main(String[] args) throws InterruptedException, ExecutionException {
         Azeitona azeitonaGalega = new Azeitona("Galega");
-        Azeitona azeitonapicual = new Azeitona("Picual");
+        Azeitona azeitonaCordovil = new Azeitona("Cordovil");
+        Azeitona azeitonaPicual = new Azeitona("Picual");
 
-        Plantacao plantacao = new Plantacao(azeitonaGalega, 4);
-        Plantacao plantacao2 = new Plantacao(azeitonapicual, 3);
+        Plantacao plantacao1 = new Plantacao(azeitonaGalega, 4);
+        Plantacao plantacao2 = new Plantacao(azeitonaGalega, 4);
+        Plantacao plantacao3 = new Plantacao(azeitonaCordovil, 3);
+        Plantacao plantacao4 = new Plantacao(azeitonaCordovil, 3);
+        Plantacao plantacao5 = new Plantacao(azeitonaPicual, 2);
 
-        Lagar lagar = new Lagar(3);
-        RecepcaoLagar recepcao = new RecepcaoLagar();
 
-        ExecutorService produzir = Executors.newFixedThreadPool(2);
+
+        ExecutorService produzir = Executors.newFixedThreadPool(5);
         ConcurrentLinkedQueue<Caminhao> fila = FilaDeCaminhoes.getInstance().getFila();
+        
+        try {
+            produzir.execute(plantacao1.produzirTask(120_000L));
+            produzir.execute(plantacao2.produzirTask(120_000L));
+            produzir.execute(plantacao3.produzirTask(120_000L));
+            produzir.execute(plantacao4.produzirTask(120_000L));
+            produzir.execute(plantacao5.produzirTask(120_000L));
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            produzir.shutdown();
+        }
+
+
+
+        Lagar lagar = new Lagar(2);
+        RecepcaoLagar recepcao = new RecepcaoLagar();
         
         Runnable descarregarCaminhoesTask = () -> {
             recepcao.descarregarCaminhoes();
         };
 
 
-        produzir.execute(plantacao.produzirTask(30_000L));
-        produzir.execute(plantacao2.produzirTask(30_000L));
-
-        produzir.shutdown();
-
-
         ExecutorService descarregarCaminhoes = Executors.newFixedThreadPool(lagar.getNumeroPortasRecepcao());
         while (!produzir.isTerminated()) {
             if (!FilaDeCaminhoes.getInstance().getFila().isEmpty())
-                descarregarCaminhoes.execute(descarregarCaminhoesTask);
+                descarregarCaminhoes.execute(recepcao.descarregarCaminhoesTask());
 
         }
         descarregarCaminhoes.shutdown();
 
-        ExecutorService descarregarRestantes = Executors.newFixedThreadPool(lagar.getNumeroPortasRecepcao());
 
-        
+        ExecutorService descarregarRestantes = Executors.newFixedThreadPool(lagar.getNumeroPortasRecepcao());
         while(true) {
             if (produzir.isTerminated() && descarregarCaminhoes.isTerminated()) {
                 //System.out.println("Aguardando caminhoes remanescentes");
@@ -56,16 +69,11 @@ public class App {
         }
         
         
-        
 
 
         
-
-
-
         
 
-        
         
     }
 }

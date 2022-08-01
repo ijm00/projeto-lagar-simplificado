@@ -1,6 +1,7 @@
 
 
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.atomic.AtomicReference;
 
 import caminhao.Caminhao;
 import caminhao.FilaDeCaminhoes;
@@ -13,6 +14,9 @@ public class Plantacao {
     private Integer distanciaAteLagar;
     private Caminhao caminhao;
     private Integer codigo;
+
+    private AtomicReference<ConcurrentLinkedQueue<Caminhao>> fila = 
+        new AtomicReference<ConcurrentLinkedQueue<Caminhao>>(FilaDeCaminhoes.getInstance().getFila());
 
 
     private static Integer geradorCodigos = 0;
@@ -40,30 +44,31 @@ public class Plantacao {
 
     public Runnable produzirTask(Long limiteTempoProducao) {
         return () -> {
-            ConcurrentLinkedQueue<Caminhao> fila = FilaDeCaminhoes.getInstance().getFila();
             long tempoTotaldecorrido = 0L;
             long tempoDecorrido;
+            long inicioOperacao = System.currentTimeMillis(); 
             while (tempoTotaldecorrido < limiteTempoProducao) {
-                long inicioOperacao = System.currentTimeMillis(); 
-                    this.abastecerCaminhao().despacharCaminhao();
+                this.abastecerCaminhao().despacharCaminhao();
+                
+                if (fila.get().size() >= 12) {
+                    try {
+                    this.suspenderProducao();
+                    System.out.println("Produção suspensa!" + " O tamanho da fila é " + fila.get().size() + ".");
+                    Thread.sleep(500);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                } 
+                
+                if (!this.isProduzindo() && fila.get().size() <= 4) {
+                    this.retomarProducao();
+                    System.out.println("Plantação " + this.codigo + "retomando produção!");
+                }
+                
                 long fimOperacao = System.currentTimeMillis();
                 tempoDecorrido = fimOperacao - inicioOperacao;
                 //System.out.println("Abastecimento ocorreu no seguinte tempo em millis: " + tempoDecorrido);
                 tempoTotaldecorrido += tempoDecorrido;
-                
-                if (fila.size() >= 12) {
-                    this.suspenderProducao();
-                    System.out.println("Produção suspensa!");
-                    try {
-                        Thread.sleep(500);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                }
-                if(!this.isProduzindo() && fila.size() == 4){
-                    this.retomarProducao();
-                    System.out.println("Plantação" + this.codigo + "retomando produção!");
-                }
             }
         };
     }
@@ -77,7 +82,7 @@ public class Plantacao {
     }
     
     public boolean isProduzindo() {
-        return produzindo;
+        return this.produzindo;
     }
 
     public Plantacao abastecerCaminhao() {
@@ -96,11 +101,7 @@ public class Plantacao {
             } catch (InterruptedException ie) {
                 ie.printStackTrace();
             }
-        } else {
-            if (!this.produzindo) {
-                //System.out.println("A plantação" + this.codigo + "parou de produzir!");
-            }
-        }
+        } 
         return this;
     }
 
