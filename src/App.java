@@ -34,6 +34,9 @@ public class App {
             produzir.shutdown();
         }
 
+        produzir.shutdown();
+
+
         Lagar lagar = new Lagar(3);
         RecepcaoLagar recepcao = new RecepcaoLagar();
 

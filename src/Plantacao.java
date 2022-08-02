@@ -1,7 +1,12 @@
 
+import java.lang.Thread.State;
 import java.time.LocalDateTime;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.ReentrantLock;
 
 import caminhao.Caminhao;
 import caminhao.FilaDeCaminhoes;
@@ -13,6 +18,9 @@ public class Plantacao {
     private Integer distanciaAteLagar;
     private Caminhao caminhao;
     private Integer codigo;
+
+    private ReentrantLock pauseLock = new ReentrantLock();
+    private Condition unpaused = pauseLock.newCondition();
 
     private AtomicReference<ConcurrentLinkedQueue<Caminhao>> fila = new AtomicReference<ConcurrentLinkedQueue<Caminhao>>(
             FilaDeCaminhoes.getInstance().getFila());
@@ -43,7 +51,9 @@ public class Plantacao {
     public Runnable produzirTask(Integer limiteTempoProducaoMinutos) {
         return () -> {
             final LocalDateTime inicioOperacao = LocalDateTime.now();
+           
             while (LocalDateTime.now().isBefore(inicioOperacao.plusMinutes(limiteTempoProducaoMinutos))) {
+                
                 if (this.produzindo) {
                     this.abastecerCaminhao().despacharCaminhao();
                 }
@@ -53,6 +63,7 @@ public class Plantacao {
                         this.suspenderProducao();
                         System.out.println("Produção suspensa!" + " O tamanho da fila é " + fila.get().size() + ".");
                         Thread.sleep(500);
+
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
@@ -63,15 +74,25 @@ public class Plantacao {
                     System.out.println("Plantação " + this.codigo + " retomando produção!");
                 }
             }
+
+                
         };
     }
 
+    
     public void suspenderProducao() {
+        pauseLock.lock();
         this.produzindo = false;
+
+        
     }
 
     public void retomarProducao() {
         this.produzindo = true;
+        unpaused.signalAll();
+      
+        pauseLock.unlock();
+      
     }
 
     public boolean isProduzindo() {
