@@ -37,10 +37,6 @@ public class App {
         Lagar lagar = new Lagar(3);
         RecepcaoLagar recepcao = new RecepcaoLagar();
 
-        Runnable descarregarCaminhoesTask = () -> {
-            recepcao.descarregarCaminhoes();
-        };
-
         ExecutorService descarregarCaminhoes = Executors.newFixedThreadPool(lagar.getNumeroPortasRecepcao());
         try {
             while (!produzir.isTerminated()) {
@@ -61,7 +57,7 @@ public class App {
                     // System.out.println("Aguardando caminhoes remanescentes");
                     Thread.sleep(15_000);
                     while (!fila.isEmpty()) {
-                        descarregarRestantes.execute(descarregarCaminhoesTask);
+                        descarregarRestantes.execute(recepcao.descarregarCaminhoesTask());
                     }
                     break;
                 }
