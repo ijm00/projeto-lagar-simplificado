@@ -49,7 +49,6 @@ public class App {
         try {
             while (true) {
                 if (descarregarCaminhoes.awaitTermination(15, TimeUnit.SECONDS)) {
-                    // System.out.println("Aguardando caminhoes remanescentes");
                     while (!fila.isEmpty()) {
                         descarregarRestantes.execute(recepcao.descarregarCaminhoesTask());
                     }

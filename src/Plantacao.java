@@ -1,13 +1,8 @@
-
-import java.lang.Thread.State;
-import java.time.LocalDateTime;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.concurrent.locks.Condition;
-import java.util.concurrent.locks.ReentrantLock;
 
 import caminhao.Caminhao;
 import caminhao.FilaDeCaminhoes;
@@ -19,9 +14,6 @@ public class Plantacao {
     private Integer distanciaAteLagar;
     private Caminhao caminhao;
     private Integer codigo;
-
-    private ReentrantLock pauseLock = new ReentrantLock();
-    private Condition unpaused = pauseLock.newCondition();
 
     private AtomicReference<ConcurrentLinkedQueue<Caminhao>> fila = new AtomicReference<ConcurrentLinkedQueue<Caminhao>>(
             FilaDeCaminhoes.getInstance().getFila());
@@ -50,11 +42,11 @@ public class Plantacao {
     }
 
     public void produzir() {
-         try {
+        try {
             ExecutorService produzir = Executors.newSingleThreadExecutor();
-             produzir.submit(produzirTask());
-             produzir.shutdown();
-             produzir.awaitTermination(1, TimeUnit.SECONDS);
+            produzir.submit(produzirTask());
+            produzir.shutdown();
+            produzir.awaitTermination(1, TimeUnit.SECONDS);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -69,18 +61,11 @@ public class Plantacao {
             }
 
             if (fila.get().size() >= 12) {
-                try {
-                    this.suspenderProducao();
-                    System.out.println("Produção suspensa!" + " O tamanho da fila é " + fila.get().size() + ".");
-                    Thread.sleep(500);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
+                this.suspenderProducao();
             }
-            
+
             if (!this.produzindo && fila.get().size() <= 4) {
                 this.retomarProducao();
-                System.out.println("Plantação " + this.codigo + " retomando produção!");
             }
 
         };
@@ -99,22 +84,17 @@ public class Plantacao {
     }
 
     public void abastecerCaminhao() {
-
         try {
             this.abastecendoCaminhao = true;
             this.caminhao = this.requisitarCaminhao();
             this.caminhao.getRelatorio().setCodigoPlantacao(this.codigo);
             this.caminhao.getRelatorio().setTipoAzeitona(this.getAzeitona().getVariedade());
-            // System.out.println("Abastecendo caminhão " + this.caminhao);
             Thread.sleep(this.caminhao.getTempoProcessamentoMillis());
             this.caminhao.avancaEstado();
             this.abastecendoCaminhao = false;
-            // System.out.println(this.caminhao + " " + this.caminhao.getEstado());
-
         } catch (InterruptedException ie) {
             ie.printStackTrace();
         }
-
     }
 
     private Caminhao requisitarCaminhao() {

@@ -7,7 +7,6 @@ public abstract class FornecedorCaminhoes {
         new Caminhao(4, 16, 2); 
 
     public static Caminhao enviarCaminhao() {
-        //System.out.println("Um novo caminhão está a caminho da plantação!");
         return fornecerCaminhao.get();
     }
 
