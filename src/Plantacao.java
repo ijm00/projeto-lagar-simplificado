@@ -54,9 +54,7 @@ public class Plantacao {
             ExecutorService produzir = Executors.newSingleThreadExecutor();
              produzir.submit(produzirTask());
              produzir.shutdown();
-             produzir.awaitTermination(this.getDistanciaAteLagar() + 8, TimeUnit.SECONDS);// TODO 8 = maximo tempo
-                                                                                          // possivel carregamento >>
-                                                                                          // inserir variavel
+             produzir.awaitTermination(1, TimeUnit.SECONDS);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }

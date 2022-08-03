@@ -19,6 +19,9 @@ public class App {
         Azeitona azeitonaCordovil = new Azeitona("Cordovil");
         Azeitona azeitonaPicual = new Azeitona("Picual");
 
+        Lagar lagar = new Lagar(3);
+        RecepcaoLagar recepcao = new RecepcaoLagar();
+
         List<Plantacao> plantacoes = new ArrayList<>() {
             {
                 add(new Plantacao(azeitonaGalega, 4));
@@ -29,32 +32,24 @@ public class App {
             }
         };
 
-        Lagar lagar = new Lagar(3);
-        RecepcaoLagar recepcao = new RecepcaoLagar();
-
-        ExecutorService descarregarCaminhoes = Executors.newFixedThreadPool(lagar.getNumeroPortasRecepcao());
-
         final var inicioOperacao = LocalDateTime.now();
-
+        
         System.out.println("Iniciando execução...");
 
+        ExecutorService descarregarCaminhoes = Executors.newFixedThreadPool(lagar.getNumeroPortasRecepcao());
         while (LocalDateTime.now().isBefore(inicioOperacao.plusMinutes(2))) {
-
             for (Plantacao plantacao : plantacoes) {
                 plantacao.produzir();
             }
-
             descarregarCaminhoes.execute(recepcao.descarregarCaminhoesTask());
-
         }
         descarregarCaminhoes.shutdown();
 
         ExecutorService descarregarRestantes = Executors.newFixedThreadPool(lagar.getNumeroPortasRecepcao());
         try {
             while (true) {
-                if (descarregarCaminhoes.isTerminated()) {
+                if (descarregarCaminhoes.awaitTermination(15, TimeUnit.SECONDS)) {
                     // System.out.println("Aguardando caminhoes remanescentes");
-                    Thread.sleep(15_000);
                     while (!fila.isEmpty()) {
                         descarregarRestantes.execute(recepcao.descarregarCaminhoesTask());
                     }
@@ -66,6 +61,5 @@ public class App {
         } finally {
             descarregarRestantes.shutdown();
         }
-
     }
 }
